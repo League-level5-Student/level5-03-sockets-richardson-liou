@@ -23,10 +23,11 @@ public class Server {
 	static JLabel messages = new JLabel();
 	JButton button = new JButton();
 	JTextField textf = new JTextField();
-	private int port;
+	int port;
 
-	private ServerSocket server;
-	private Socket connection;
+	ServerSocket server;
+	Socket connection;
+
 
 	ObjectOutputStream os;
 	ObjectInputStream is;
@@ -47,23 +48,20 @@ public class Server {
 		frame.setVisible(true);
 		
 		try {
-			server = new ServerSocket(port, 100);
+			server = new ServerSocket(port, 5300);
 
 			connection = server.accept();
 
 			os = new ObjectOutputStream(connection.getOutputStream());
 			is = new ObjectInputStream(connection.getInputStream());
-
-			os.flush();
-
 			while (connection.isConnected()) {
 				try {
-					JOptionPane.showMessageDialog(null, is.readObject());
-					
-					System.out.println(is.readObject());
-				}catch(EOFException e) {
-					JOptionPane.showMessageDialog(null, "Connection Lost");
-					System.exit(0);
+					Object message = is.readObject();
+					JOptionPane.showMessageDialog(null, "Client: " + message);
+					System.out.println(message);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 
@@ -73,20 +71,17 @@ public class Server {
 	}
 	
 	public void SendMessage(String str) {
-		try {
-			if (os != null) {
-				os.writeObject(str + ".");
-				messages.setText(messages.getText() + "You said, " + str);
-				os.flush();
-			} else {
-				JOptionPane.showMessageDialog(null, "Error");
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		System.out.println("Sending message");
+	    try {
+	        if (os != null) {
+	            os.writeObject(str);
+	            messages.setText("<html>" + messages.getText() + "<br>You: " + str + "</html>");
+	            os.flush();
+	        } else {
+	            JOptionPane.showMessageDialog(null, "Error");
+	        }
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
 	}
 	
 	public String getIPAddress() {

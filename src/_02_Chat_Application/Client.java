@@ -14,9 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class Client {
-	private String ip;
-	private int port;
-	private ChatApp chatApp;
+	String ip;
+	int port;
 
 	Socket connection;
 	
@@ -25,6 +24,7 @@ public class Client {
 	JLabel messages = new JLabel();
 	JButton button = new JButton();
 	JTextField textf = new JTextField();
+
 
 	ObjectOutputStream os;
 	ObjectInputStream is;
@@ -52,6 +52,17 @@ public class Client {
 			is = new ObjectInputStream(connection.getInputStream());
 
 			os.flush();
+			while (connection.isConnected()) {
+				try {
+					Object message = is.readObject();
+					JOptionPane.showMessageDialog(null, message);
+					System.out.println(message);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
 		}
 		
 		catch (Exception e) {
@@ -59,16 +70,7 @@ public class Client {
 			e.printStackTrace();
 		}
 		
-		while (connection.isConnected()) {
-			try {
-				JOptionPane.showMessageDialog(null, is.readObject());
-				System.out.println(is.readObject());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-		}
-	}
 	
 	public void SendMessage(String str) {
 		try {
@@ -87,18 +89,4 @@ public class Client {
 		System.out.println("Sending message");
 	}
 	
-	public void receiveMessage () {
-		if(connection.isConnected()) {
-			try {
-				os.flush();
-				String message = (String) is.readObject();
-				String message2 = (String) is.readObject();
-				System.out.println(message + " " + message2);
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-			
-	}
-}
 }
